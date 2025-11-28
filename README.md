@@ -1,38 +1,130 @@
-🧾 AI-Powered Bill Extraction APIHackRx Datathon SubmissionThis project is a high-precision document extraction API designed to process multi-page medical and pharmacy bills. It utilizes Multimodal Large Language Models (GPT-4o) to visually analyze invoices, extract line-item details, and structure the data into a standardized JSON format.🚀 Key FeaturesMultimodal Analysis: Uses Vision AI to understand document layout, handling complex tables better than traditional OCR.Smart Parsing: Automatically distinguishes between "Bill Details", "Final Bill", and "Pharmacy" pages.Double-Counting Prevention: Implements strict logic to exclude "Subtotal", "Tax", and "Grand Total" rows, ensuring the calculated total matches the actual bill total.PDF & Image Support: Handles both direct image URLs and multi-page PDFs.Schema Validation: Uses Pydantic to ensure the output always matches the strict hackathon schema.🛠️ Tech StackLanguage: Python 3.10Framework: FastAPI (High-performance web framework)AI Model: OpenAI GPT-4o (Vision Capability)Image Processing: pdf2image, Pillow (PIL)Containerization: Docker🧠 The Approach (Methodology)1. Visual IngestionUnlike traditional OCR (Tesseract) which reads text line-by-line and loses table context, we convert every PDF page into a high-resolution image. We feed this image to GPT-4o, allowing the model to "see" the grid lines, headers, and column alignment just like a human would.2. Prompt Engineering for AccuracyTo solve the "Double Counting" problem, we utilize a strict System Prompt that instructs the model to:Identify and ignore summary rows (e.g., "Total", "Subtotal", "GST", "Amount Due").Only extract rows that represent physical goods or services.Infer missing quantities (defaulting to 1.0) where columns are ambiguous.3. Post-ProcessingThe Python backend performs a secondary pass on the extracted data:Standardizes currency formats (removing $, ₹, ,).Validates data types.Calculates token usage for cost transparency.⚙️ Local Setup & InstallationPrerequisitesPython 3.10+Poppler: Required for PDF conversion.Mac: brew install popplerWindows: Download Binary and add to PATH.Linux: sudo apt-get install poppler-utilsInstallation StepsClone the repositorygit clone <your-repo-link>
-cd bill-extractor
-Create Virtual Environmentpython -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-Install Dependenciespip install -r requirements.txt
-Set Environment VariablesCreate a .env file in the root directory:OPENAI_API_KEY=sk-proj-your-actual-api-key-here
-Run the Serveruvicorn main:app --reload
-The API will be live at http://127.0.0.1:8000.🐳 Docker Deployment (Recommended)To ensure the application runs in any environment (and to handle the Poppler dependency automatically), use Docker.Build the Imagedocker build -t bill-extractor .
-Run the Containerdocker run -p 8000:8000 --env-file .env bill-extractor
-📡 API UsageEndpoint: POST /extract-bill-dataRequest Body:{
-  "document": "[https://hackrx.blob.core.windows.net/assets/datathon-IIT/sample_2.png](https://hackrx.blob.core.windows.net/assets/datathon-IIT/sample_2.png)"
+# **🧾 AI-Powered Bill Extraction API**
+
+### **🏆 HackRx Datathon Submission**
+
+This repository contains a high-precision document extraction API designed to process multi-page medical and pharmacy bills. It utilizes **Multimodal Large Language Models (GPT-4o)** to visually analyze invoices, extract line-item details, and structure the data into a standardized JSON format while strictly avoiding double-counting of totals.
+
+## **🚀 Key Features**
+
+* **Multimodal Analysis:** Uses Vision AI to understand document layout, handling complex tables, blurred text, and non-standard fonts better than traditional OCR (Tesseract).  
+* **Smart Parsing:** Automatically classifies pages into "Bill Detail", "Final Bill", or "Pharmacy".  
+* **Double-Counting Prevention:** Implements a two-layer filter (System Prompt \+ Python Logic) to exclude "Subtotal", "Tax", "GST", and "Grand Total" rows, ensuring the AI-calculated total matches the actual bill total.  
+* **PDF & Image Support:** Seamlessly handles direct image URLs and multi-page PDF documents.  
+* **Strict Schema:** Powered by Pydantic to ensure the API response always matches the required Datathon JSON schema.
+
+## **🛠️ Tech Stack**
+
+* **Language:** Python 3.10  
+* **Web Framework:** FastAPI  
+* **AI Model:** OpenAI GPT-4o (Vision)  
+* **Image Processing:** pdf2image, Pillow (PIL)  
+* **Containerization:** Docker
+
+## **🧠 Methodology & Logic**
+
+### **1\. Visual Ingestion**
+
+Instead of parsing text blindly, we convert PDF pages into high-resolution images. We feed these images to **GPT-4o**, allowing the model to "see" grid lines, column headers, and indented summaries just like a human auditor.
+
+### **2\. Accuracy & Double-Counting Logic**
+
+To satisfy the evaluation criteria (Total AI Extracted Amount ≈ Actual Bill Total), we use a strict extraction protocol:
+
+1. **Prompt Engineering:** The LLM is explicitly instructed to **ignore** summary rows (Subtotal, Tax, Balance Due) and only extract physical line items.  
+2. **Post-Processing Filter:** A Python-side filter scans extracted item names for keywords like "Total", "GST", "Amount Due" and removes them if the AI accidentally includes them.  
+3. **Data Sanitization:** Cleans currency symbols ($, ₹) and standardizes numeric values.
+
+## **⚙️ Local Setup & Installation**
+
+### **Prerequisites**
+
+* Python 3.10+  
+* **Poppler** (Required for PDF processing):  
+  * *Mac:* brew install poppler  
+  * *Windows:* [Download Binary](https://www.google.com/search?q=http://blog.alivate.com.au/poppler-windows/) and add to PATH.  
+  * *Linux:* sudo apt-get install poppler-utils
+
+### **Step-by-Step Guide**
+
+1. **Clone the Repository**  
+   git clone \[https://github.com/your-username/your-repo-name.git\](https://github.com/your-username/your-repo-name.git)  
+   cd bill-extractor
+
+2. **Create Virtual Environment**  
+   python \-m venv venv  
+   \# Windows  
+   venv\\Scripts\\activate  
+   \# Mac/Linux  
+   source venv/bin/activate
+
+3. **Install Dependencies**  
+   pip install \-r requirements.txt
+
+4. Configure API Key  
+   Create a .env file in the root directory:  
+   OPENAI\_API\_KEY=sk-proj-your-key-here
+
+5. **Run the Server**  
+   uvicorn main:app \--reload
+
+   The API will be accessible at http://127.0.0.1:8000.
+
+## **🐳 Docker Deployment (Recommended)**
+
+Docker handles the system-level Poppler dependency automatically, making deployment to cloud platforms (Render, Railway, AWS) seamless.
+
+1. **Build the Image**  
+   docker build \-t bill-extractor .
+
+2. **Run the Container**  
+   docker run \-p 8000:8000 \--env-file .env bill-extractor
+
+## **📡 API Usage**
+
+### **Endpoint**
+
+POST /extract-bill-data
+
+### **Sample Request (cURL)**
+
+curl \-X POST "\[http://127.0.0.1:8000/extract-bill-data\](http://127.0.0.1:8000/extract-bill-data)" \\  
+     \-H "Content-Type: application/json" \\  
+     \-d '{  
+           "document": "\[https://hackrx.blob.core.windows.net/assets/datathon-IIT/sample\_2.png\](https://hackrx.blob.core.windows.net/assets/datathon-IIT/sample\_2.png)"  
+         }'
+
+### **Sample Response**
+
+{  
+    "is\_success": true,  
+    "token\_usage": {  
+        "total\_tokens": 1250,  
+        "input\_tokens": 1000,  
+        "output\_tokens": 250  
+    },  
+    "data": {  
+        "pagewise\_line\_items": \[  
+            {  
+                "page\_no": "1",  
+                "page\_type": "Bill Detail",  
+                "bill\_items": \[  
+                    {  
+                        "item\_name": "Consultation Fee",  
+                        "item\_amount": 500.0,  
+                        "item\_rate": 500.0,  
+                        "item\_quantity": 1.0  
+                    }  
+                \]  
+            }  
+        \],  
+        "total\_item\_count": 1  
+    }  
 }
-Success Response (200 OK):{
-    "is_success": true,
-    "token_usage": {
-        "total_tokens": 1450,
-        "input_tokens": 1200,
-        "output_tokens": 250
-    },
-    "data": {
-        "pagewise_line_items": [
-            {
-                "page_no": "1",
-                "page_type": "Bill Detail",
-                "bill_items": [
-                    {
-                        "item_name": "Consultation Fee",
-                        "item_amount": 500.0,
-                        "item_rate": 500.0,
-                        "item_quantity": 1.0
-                    }
-                ]
-            }
-        ],
-        "total_item_count": 1
-    }
-}
-🧪 Evaluation & AccuracyWe tested this solution against the sample dataset provided.Accuracy: ~98% line item retrieval rate.Total Calculation: By strictly filtering "Subtotal" rows via both Prompt Engineering and Python logic, the calculated sum(item_amount) matches the actual Grand Total on complex multi-page invoices.
+
+## **📂 Project Structure**
+
+├── main.py              \# Application entry point & logic  
+├── requirements.txt     \# Python dependencies  
+├── Dockerfile           \# Deployment configuration  
+├── .env                 \# API Keys (GitIgnored)  
+└── README.md            \# Documentation  
