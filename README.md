@@ -46,55 +46,62 @@ To satisfy the evaluation criteria (Total AI Extracted Amount ≈ Actual Bill To
 
 ### **Step-by-Step Guide**
 
-1. **Clone the Repository**  
+1. **Clone the Repository**
+```
    git clone \[https://github.com/your-username/your-repo-name.git\](https://github.com/your-username/your-repo-name.git)  
    cd bill-extractor
-
-2. **Create Virtual Environment**  
+```
+2. **Create Virtual Environment**
+``` 
    python \-m venv venv  
    \# Windows  
    venv\\Scripts\\activate  
    \# Mac/Linux  
    source venv/bin/activate
-
-3. **Install Dependencies**  
+```
+3. **Install Dependencies**
+```
    pip install \-r requirements.txt
-
-4. Configure API Key  
+```
+4. Configure API Key
+```
    Create a .env file in the root directory:  
    OPENAI\_API\_KEY=sk-proj-your-key-here
-
-5. **Run the Server**  
+```
+5. **Run the Server**
+```
    uvicorn main:app \--reload
 
    The API will be accessible at http://127.0.0.1:8000.
-
+```
 ## **🐳 Docker Deployment (Recommended)**
 
 Docker handles the system-level Poppler dependency automatically, making deployment to cloud platforms (Render, Railway, AWS) seamless.
 
 1. **Build the Image**  
+```
    docker build \-t bill-extractor .
-
+```
 2. **Run the Container**  
+```
    docker run \-p 8000:8000 \--env-file .env bill-extractor
-
+```
 ## **📡 API Usage**
 
 ### **Endpoint**
-
+```
 POST /extract-bill-data
-
+```
 ### **Sample Request (cURL)**
-
+```
 curl \-X POST "\[http://127.0.0.1:8000/extract-bill-data\](http://127.0.0.1:8000/extract-bill-data)" \\  
      \-H "Content-Type: application/json" \\  
      \-d '{  
            "document": "\[https://hackrx.blob.core.windows.net/assets/datathon-IIT/sample\_2.png\](https://hackrx.blob.core.windows.net/assets/datathon-IIT/sample\_2.png)"  
          }'
-
+```
 ### **Sample Response**
-
+```
 {  
     "is\_success": true,  
     "token\_usage": {  
@@ -120,11 +127,12 @@ curl \-X POST "\[http://127.0.0.1:8000/extract-bill-data\](http://127.0.0.1:8000
         "total\_item\_count": 1  
     }  
 }
-
+```
 ## **📂 Project Structure**
-
+```
 ├── main.py              \# Application entry point & logic  
 ├── requirements.txt     \# Python dependencies  
 ├── Dockerfile           \# Deployment configuration  
 ├── .env                 \# API Keys (GitIgnored)  
 └── README.md            \# Documentation  
+```
